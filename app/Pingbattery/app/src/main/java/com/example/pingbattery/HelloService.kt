@@ -38,8 +38,9 @@ class HelloService : Service() {
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
 
         return NotificationCompat.Builder(this, channel_id)
-            .setContentTitle("Pingbattery is running")
-            .setContentText("why are you running")
+            .setContentTitle("Active")
+            .setContentText("Switching $socketId on at $turnOnAt% and off at $turnOffAt%")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .build()
     }
@@ -99,7 +100,6 @@ class HelloService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         // Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show()
-        startForeground(1, createNotification(createNotificationChannel()))
 
         // get params from intent
         turnOnAt = intent.getIntExtra("on", 40)
@@ -107,6 +107,8 @@ class HelloService : Service() {
         batteryCheckInterval = intent.getIntExtra("interval", 5000).toLong()
         socketId = intent.getStringExtra("socket").toString()
         host = intent.getStringExtra("host").toString()
+
+        startForeground(1, createNotification(createNotificationChannel()))
 
         batteryCheckThread = Thread(Runnable {
             try {

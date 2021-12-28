@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     public fun onTest(view: View) {
-        req("http://192.168.2.240:8000/1000cc4a9e/off", "POST")
+        req("${hostText?.text}/${socketId?.text}/off", "POST")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
