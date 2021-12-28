@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
 
     private var enabled = false
     private var enableButton:Button? = null
-    private var testButton: Button? = null
     private var intervalNumber:EditText? = null
     private var onNumber:EditText? = null
     private var offNumber:EditText? = null
@@ -61,8 +60,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public fun onTest(view: View) {
+    public fun forceSwitchOff(view: View) {
         req("${hostText?.text}/${socketId?.text}/off", "POST")
+    }
+
+    public fun forceSwitchOn(view: View) {
+        req("${hostText?.text}/${socketId?.text}/on", "POST")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +75,6 @@ class MainActivity : AppCompatActivity() {
         enabled = isServiceRunning(HelloService::class.java)
         // set elements
         enableButton = findViewById<View>(R.id.enable_button) as Button
-        testButton = findViewById<View>(R.id.test_button) as Button
         intervalNumber = findViewById<View>(R.id.interval_number) as EditText
         offNumber = findViewById<View>(R.id.turn_off_number) as EditText
         onNumber = findViewById<View>(R.id.turn_on_number) as EditText

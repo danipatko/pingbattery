@@ -96,7 +96,7 @@ class HelloService : Service() {
     private var turnOffAt:Int = 90
     private var batteryCheckInterval:Long = 5000
     private var socketId:String = "1000cc4a9e"    // id of socket to ping
-    private var host:String = "http://192.168.2.240:8000"   // address to ping
+    private var host:String = "http://192.168.2.171:8000"   // address to ping
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         // Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show()
