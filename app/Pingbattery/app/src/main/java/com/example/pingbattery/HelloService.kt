@@ -99,8 +99,6 @@ class HelloService : Service() {
     private var host:String = "http://192.168.2.171:8000"   // address to ping
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        // Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show()
-
         // get params from intent
         turnOnAt = intent.getIntExtra("on", 40)
         turnOffAt = intent.getIntExtra("off", 90)
@@ -122,7 +120,8 @@ class HelloService : Service() {
         })
 
         batteryCheckThread?.start()
-        return START_NOT_STICKY
+        Toast.makeText(this, "Service started", Toast.LENGTH_SHORT).show()
+        return START_STICKY
     }
 
     override fun onBind(intent: Intent): IBinder? {

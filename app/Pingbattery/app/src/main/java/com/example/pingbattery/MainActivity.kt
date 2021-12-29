@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.app.ActivityManager
 import android.content.Context
 import android.view.WindowManager
+import android.widget.Toast
 import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
@@ -43,12 +44,11 @@ class MainActivity : AppCompatActivity() {
         if(enabled) {
             Intent(this, HelloService::class.java).also { intent ->
                 intent
-                    .putExtra("interval", "${intervalNumber?.text}".toInt())
+                    .putExtra("interval", "${intervalNumber?.text}".toInt() * 1000)
                     .putExtra("on", "${onNumber?.text}".toInt())
                     .putExtra("off", "${offNumber?.text}".toInt())
                     .putExtra("socket", "${socketId?.text}")
                     .putExtra("host", "${hostText?.text}")
-
                 startService(intent)
             }
             enableButton?.text = "disable"
@@ -60,12 +60,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public fun forceSwitchOff(view: View) {
+    fun forceSwitchOff(view: View) {
         req("${hostText?.text}/${socketId?.text}/off", "POST")
     }
 
-    public fun forceSwitchOn(view: View) {
+    fun forceSwitchOn(view: View) {
         req("${hostText?.text}/${socketId?.text}/on", "POST")
+    }
+
+    fun savePreferences(view: View) {
+        val sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
+        with (sharedPref.edit()) {
+            putInt("interval", "${intervalNumber?.text}".toInt())
+            putInt("off", "${offNumber?.text}".toInt())
+            putInt("on", "${onNumber?.text}".toInt())
+            putString("socket", "${socketId?.text}")
+            putString("host", "${hostText?.text}")
+
+            apply()
+        }
+        Toast.makeText(this, "Preferences saved!", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun loadPreferences(){
+        val sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
+        intervalNumber?.setText(sharedPref.getInt("interval", 30).toString())
+        offNumber?.setText(sharedPref.getInt("off", 90).toString())
+        onNumber?.setText(sharedPref.getInt("on", 40).toString())
+        socketId?.setText(sharedPref.getString("socket", "1000cc4a9e"))
+        hostText?.setText(sharedPref.getString("host", "http://192.168.2.171:8000"))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +103,7 @@ class MainActivity : AppCompatActivity() {
         onNumber = findViewById<View>(R.id.turn_on_number) as EditText
         socketId = findViewById<View>(R.id.socket_id_text) as EditText
         hostText = findViewById<View>(R.id.host_field) as EditText
+        loadPreferences()
 
         if(enabled)
             enableButton?.text = "disable"
