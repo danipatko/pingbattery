@@ -29,3 +29,14 @@ That's all you need to know, you can set the endpoint and socket ID in the appli
 | Turn off above % | Turn off socket if battery percentage exceeds this number |
 | Socket ID | The ID of the socket to turn on/off |
 | Address/Endpoint | The host or endpoint of the server to send the request to |
+
+Press enable to start the service, it runs in the background so you can close the app. 
+
+## Screenshots
+very frontend (no)  
+
+<img src="https://github.com/danipatko/pingbattery/blob/main/pics/screenshot_app.jpg" data-canonical-src="https://github.com/danipatko/pingbattery/blob/main/pics/screenshot_app.jpg" width="200" height="400" />
+
+the notification  
+
+<img src="https://github.com/danipatko/pingbattery/blob/main/pics/screenshot_notification.jpg" data-canonical-src="https://github.com/danipatko/pingbattery/blob/main/pics/screenshot_notification.jpg" width="400" height="150" />
