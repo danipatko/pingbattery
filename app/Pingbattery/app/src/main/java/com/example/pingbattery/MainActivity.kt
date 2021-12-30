@@ -11,7 +11,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.app.ActivityManager
 import android.content.Context
-import android.view.WindowManager
 import android.widget.Toast
 import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -20,6 +19,7 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
+    // values / buttons
     private var enabled = false
     private var enableButton:Button? = null
     private var intervalNumber:EditText? = null
@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var socketId:EditText? = null
     private var hostText:EditText? = null
 
+    // check if batteryService is running in the background
     private fun isServiceRunning(serviceClass: Class<*>): Boolean {
         val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (service in manager.getRunningServices(Int.MAX_VALUE)) {
@@ -39,10 +40,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    public fun onEnable (view: View) {
+    fun onEnable (view: View) {
         enabled = !enabled
         if(enabled) {
-            Intent(this, HelloService::class.java).also { intent ->
+            // start service with current settings
+            Intent(this, BatteryService::class.java).also { intent ->
                 intent
                     .putExtra("interval", "${intervalNumber?.text}".toInt() * 1000)
                     .putExtra("on", "${onNumber?.text}".toInt())
@@ -51,23 +53,28 @@ class MainActivity : AppCompatActivity() {
                     .putExtra("host", "${hostText?.text}")
                 startService(intent)
             }
+            // change text of button
             enableButton?.text = "disable"
         } else {
-            Intent(this, HelloService::class.java).also { intent ->
+            // stop the service
+            Intent(this, BatteryService::class.java).also { intent ->
                 stopService(intent)
             }
             enableButton?.text = "enable"
         }
     }
 
+    // send an off request directly
     fun forceSwitchOff(view: View) {
         req("${hostText?.text}/${socketId?.text}/off", "POST")
     }
 
+    // send an on request
     fun forceSwitchOn(view: View) {
         req("${hostText?.text}/${socketId?.text}/on", "POST")
     }
 
+    // save current settings in shared preferences
     fun savePreferences(view: View) {
         val sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
         with (sharedPref.edit()) {
@@ -82,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Preferences saved!", Toast.LENGTH_SHORT).show()
     }
 
+    // load saved preferences (or defaults)
     private fun loadPreferences(){
         val sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
         intervalNumber?.setText(sharedPref.getInt("interval", 30).toString())
@@ -91,11 +99,12 @@ class MainActivity : AppCompatActivity() {
         hostText?.setText(sharedPref.getString("host", "http://192.168.2.171:8000"))
     }
 
+    // called on load
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         // check if service is already running
-        enabled = isServiceRunning(HelloService::class.java)
+        enabled = isServiceRunning(BatteryService::class.java)
         // set elements
         enableButton = findViewById<View>(R.id.enable_button) as Button
         intervalNumber = findViewById<View>(R.id.interval_number) as EditText
@@ -108,10 +117,10 @@ class MainActivity : AppCompatActivity() {
         if(enabled)
             enableButton?.text = "disable"
 
-        Log.i("App", "Successfully started!")
+        Log.i("App", "Successfully started!")   // DEBUG
     }
 
-
+    // network stuff
     private val client = OkHttpClient()
     // send empty request to URL
     private fun req(url: String, method:String) {
@@ -123,10 +132,10 @@ class MainActivity : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i("REQ", "Failed to invoke request\n$e")
+                Log.i("req", "Failed to invoke request\n$e")    // DEBUG
             }
             override fun onResponse(call: Call, response: Response) {
-                Log.i("REQ", "Received response: $response")
+                Log.i("req", "Received response: $response")    // DEBUG
             }
         })
     }
